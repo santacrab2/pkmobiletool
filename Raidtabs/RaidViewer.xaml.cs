@@ -6,8 +6,7 @@ using static PKHeX.Core.Encounters9;
 
 
 using static pk9reader.MainPage;
-using Microsoft.Maui.Graphics;
-using System.Reflection.Metadata.Ecma335;
+
 
 namespace pk9reader;
 
@@ -136,7 +135,7 @@ public partial class RaidViewer : ContentPage
             {
                 case TeraRaidContentType.Distribution:
 
-                    var game = GameVersion.SL;
+                    
 
 
 
@@ -145,8 +144,8 @@ public partial class RaidViewer : ContentPage
                    // var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game is GameVersion.SL ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is GameVersion.SL ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxd > 0)
                         {
 
@@ -187,24 +186,19 @@ public partial class RaidViewer : ContentPage
                     returnlist.Add(new raidsprite(pkr, raid)); break;
                 case TeraRaidContentType.Base05:
                     var starxoro = getxoronextint(raid.Seed, 100);
-                    var stars = starxoro switch
-                    {
-                        <= 30 => 3,
-                        <= 70 => 4,
-                        > 70 => 5,
-                    };
+                    var stars = CalcStars(starxoro, progress);
                     if (raid.Content == TeraRaidContentType.Black6)
                         stars = 6;
-                    var game5 = GameVersion.SL;
+                    
 
 
-                    var max = game5 is GameVersion.SL ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
+                    var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
                     var rateRand = getxororandrate(raid.Seed, (uint)max, stars);
 
                     foreach (var theencounter in Tera)
                     {
-                        var min = game5 is GameVersion.SL ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
 
@@ -241,24 +235,17 @@ public partial class RaidViewer : ContentPage
                     returnlist.Add(new raidsprite(pk5, raid)); break;
                 case TeraRaidContentType.Black6:
                     starxoro = getxoronextint(raid.Seed, 100);
-                    stars = starxoro switch
-                    {
-                        <= 30 => 3,
-                        <= 70 => 4,
-                        > 70 => 5,
-                    };
-                    if (raid.Content == TeraRaidContentType.Black6)
-                        stars = 6;
-                    var game6 = GameVersion.SL;
+                    stars = 6;
+                    
 
 
-                    max = game6 is GameVersion.SL ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
+                    max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
                     rateRand = getxororandrate(raid.Seed, (uint)max, stars);
 
                     foreach (var theencounter in Tera)
                     {
-                        var min = game6 is GameVersion.SL ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
 
@@ -294,12 +281,12 @@ public partial class RaidViewer : ContentPage
 
                     returnlist.Add(new raidsprite(pk6, raid)); break;
                 case TeraRaidContentType.Might7:
-                    var game7 = GameVersion.SL;
+                    
 
                     foreach (var theencounter in might)
                     {
-                        var maxm = game7 is GameVersion.SL ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game7 is GameVersion.SL ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxm = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxm > 0)
                         {
 
@@ -363,25 +350,20 @@ public partial class RaidViewer : ContentPage
             {
                 case TeraRaidContentType.Base05:
                     int starxoro = getxoronextint((uint)seed, 100);
-                    var stars = starxoro switch
-                    {
-                        <= 30 => 3,
-                        <= 70 => 4,
-                        > 70 => 5,
-                    };
+                    var stars = CalcStars(starxoro, progress);
                     if (mainpk.Raid.Content == TeraRaidContentType.Black6)
                         stars = 6;
-                    var game = GameVersion.SL;
+                    
 
 
-                    var max = game is GameVersion.SL ? PKHeX.Core.EncounterTera9.GetRateTotalBaseSL(stars) : PKHeX.Core.EncounterTera9.GetRateTotalBaseVL(stars);
+                    var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
                     var rateRand = getxororandrate((uint)seed, (uint)max, stars);
 
-                    PKHeX.Core.EncounterTera9 encounter = null;
+                    EncounterTera9 encounter = null;
                     foreach (var theencounter in Tera)
                     {
-                        var min = game is GameVersion.SL ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
                             if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
@@ -407,25 +389,18 @@ public partial class RaidViewer : ContentPage
 
                 case TeraRaidContentType.Black6:
                     starxoro = getxoronextint((uint)seed, 100);
-                    stars = starxoro switch
-                    {
-                        <= 30 => 3,
-                        <= 70 => 4,
-                        > 70 => 5,
-                    };
-                    if (mainpk.Raid.Content == TeraRaidContentType.Black6)
-                        stars = 6;
-                    game = GameVersion.SL;
+                    stars = 6;
+                    
 
 
-                    max = game is GameVersion.SL ? PKHeX.Core.EncounterTera9.GetRateTotalBaseSL(stars) : PKHeX.Core.EncounterTera9.GetRateTotalBaseVL(stars);
+                    max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
                     rateRand = getxororandrate((uint)seed, (uint)max, stars);
 
                     encounter = null;
                     foreach (var theencounter in Tera)
                     {
-                        var min = game is GameVersion.SL ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
                             if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
@@ -451,7 +426,7 @@ public partial class RaidViewer : ContentPage
                 case TeraRaidContentType.Distribution:
 
 
-                    game = GameVersion.SL;
+                    
 
 
 
@@ -460,8 +435,8 @@ public partial class RaidViewer : ContentPage
                     //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game is GameVersion.SL ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is GameVersion.SL ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxd > 0)
                         {
 
@@ -486,7 +461,7 @@ public partial class RaidViewer : ContentPage
                     mainpk.pkm.SetIsShiny(xor < 16); break;
                 case TeraRaidContentType.Might7:
 
-                    game = GameVersion.SL;
+                   
 
 
 
@@ -495,8 +470,8 @@ public partial class RaidViewer : ContentPage
                     //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in might)
                     {
-                        var maxd = game is GameVersion.SL ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is GameVersion.SL ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxd > 0)
                         {
 
@@ -578,6 +553,45 @@ public partial class RaidViewer : ContentPage
 
         }
     }
+    public static int CalcStars(int rand, int progress)
+    {
+        
+
+        return progress switch
+        {
+            5 => rand switch
+            {
+                > 70 => 5,
+                > 30 => 4,
+                _ => 3,
+            },
+            4 => rand switch
+            {
+                > 75 => 5,
+                > 40 => 4,
+                _ => 3,
+            },
+            3 => rand switch
+            {
+                > 70 => 4,
+                > 40 => 3,
+                > 20 => 2,
+                _ => 1,
+            },
+            2 => rand switch
+            {
+                > 70 => 3,
+                > 30 => 2,
+                _ => 1,
+            },
+            1 => rand switch
+            {
+                > 80 => 2,
+                _ => 1,
+            },
+        };
+    }
+
     public async void teleport(object sender, EventArgs e)
     {
         try

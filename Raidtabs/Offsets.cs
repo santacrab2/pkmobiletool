@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PKHeX.Core;
 using pkNX.Structures.FlatBuffers;
 namespace pk9reader
 {
     public class Offsets
     {
+        public const string ScarletID = "0100A3D008C5C000";
+        public const string VioletID = "01008F6008C5E000";
         public static byte[][] GetEventEncounterDataFromSAV(PKHeX.Core.SAV9SV sav2)
         {
             byte[][] res = null!;
@@ -39,8 +42,8 @@ namespace pk9reader
 
                 if (items.Any(z => z.RaidEnemyinfo.Difficulty == 7))
                     throw new Exception($"Mixed difficulty {items.First(z => z.RaidEnemyinfo.Difficulty > 7).RaidEnemyinfo.Difficulty}");
-                if (isNot7Star)
-                    throw new Exception("Already saw a not-7-star group. How do we differentiate this slot determination from prior?");
+               // if (isNot7Star)
+                //    throw new Exception("Already saw a not-7-star group. How do we differentiate this slot determination from prior?");
                 isNot7Star = true;
                 AddToList(items, type2list, RaidSerializationFormat.Type2);
             }

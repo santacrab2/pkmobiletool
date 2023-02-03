@@ -148,7 +148,11 @@ public sealed record EncounterDist9 : EncounterStatic, ITeraRaid9
         var count = data.Length / SerializedSize;
         var result = new EncounterDist9[count];
         for (int i = 0; i < result.Length; i++)
-            result[i] = ReadEncounter(data.Slice(i * SerializedSize, SerializedSize));
+        {
+            var tempresult = ReadEncounter(data.Slice(i * SerializedSize, SerializedSize));
+            if (tempresult.RandRate3TotalScarlet != 0)
+                result[i] = tempresult;
+        }
         return result;
     }
 

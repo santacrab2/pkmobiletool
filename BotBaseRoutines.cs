@@ -340,5 +340,31 @@ namespace pk9reader
             p[count] = 0x0;
             return p;
         }
+        public async Task<int> ReadGameProgress(CancellationToken token)
+        {
+            
+
+            var Unlocked6Stars = (await ReadEncryptedBlock(Blocks.KUnlockedRaidDifficulty6, 1, token).ConfigureAwait(false))[0] == 2;
+
+            if (Unlocked6Stars)
+                return 5;
+
+            var Unlocked5Stars = (await ReadEncryptedBlock(Blocks.KUnlockedRaidDifficulty5, 1, token).ConfigureAwait(false))[0] == 2;
+
+            if (Unlocked5Stars)
+                return 4;
+
+            var Unlocked4Stars = (await ReadEncryptedBlock(Blocks.KUnlockedRaidDifficulty4, 1, token).ConfigureAwait(false))[0] == 2;
+
+            if (Unlocked4Stars)
+                return 3;
+
+            var Unlocked3Stars = (await ReadEncryptedBlock(Blocks.KUnlockedRaidDifficulty3, 1, token).ConfigureAwait(false))[0] == 2;
+
+            if (Unlocked3Stars)
+                return 2;
+
+            return 1;
+        }
     }
 }

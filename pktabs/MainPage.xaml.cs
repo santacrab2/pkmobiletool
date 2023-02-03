@@ -55,6 +55,8 @@ public partial class MainPage : ContentPage
     public static Socket SwitchConnection = new Socket(SocketType.Stream, ProtocolType.Tcp);
     public static string spriteurl = "iconp.png";
     public static string ipaddy = "";
+    public static string game;
+    public static int progress;
     public async void pk9picker_Clicked(object sender, EventArgs e)
     {
         
@@ -274,6 +276,8 @@ public partial class MainPage : ContentPage
             var off = await botBase.PointerRelative(new long[] { 0x4384B18, 0x148, 0x40 });
             var read = await botBase.ReadBytesAsync((uint)off, info.Data.Length);
             read.CopyTo(info.Data, 0);
+            game = await botBase.GetTitleID();
+            progress = await botBase.ReadGameProgress(CancellationToken.None);
             var KBCATEventRaidPriority = temp.Accessor.FindOrDefault(Blocks.KBCATRaidPriorityArray.Key);
             var raidpriorityblock = await botBase.ReadEncryptedBlock(Blocks.KBCATRaidPriorityArray, CancellationToken.None);
             if (KBCATEventRaidPriority.Type is not SCTypeCode.None)
@@ -454,5 +458,9 @@ public partial class MainPage : ContentPage
         sav = temp;
     }
 
+    private void updateip(object sender, TextChangedEventArgs e)
+    {
+        ipaddy = IP.Text;
+    }
 }
 
