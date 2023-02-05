@@ -93,162 +93,24 @@ public partial class teleporter : ContentPage
     {
         SAV9SV tempsave = (SAV9SV)sav;
         int v = 0;
-        allshinybutton.Text = $"loading {v}";
-        await Task.Delay(500);
         var raidlists = await raidlist();
         foreach (raidsprite raid in raidlists)
         {
-            allshinybutton.Text = $"loading {v}";
-            await Task.Delay(500);
+            allshinybutton.Text = $"searching {v}";
+            await Task.Delay(100);
             if (raid.pkm.IsShiny)
             {
                 v++;
                 continue;
             }
             ulong seed = raid.Raid.Seed;
-            while (!raid.pkm.IsShiny)
+            try
             {
-
-                seed = getxoronextseed((uint)seed);
-                switch (raid.Raid.Content)
-                {
-                    case TeraRaidContentType.Base05:
-                        int starxoro = getxoronextint((uint)seed, 100);
-                        var stars = CalcStars(starxoro, progress);
-                        if (raid.Raid.Content == TeraRaidContentType.Black6)
-                            stars = 6;
-                        
-
-
-                        var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : PKHeX.Core.EncounterTera9.GetRateTotalBaseVL(stars);
-
-                        var rateRand = getxororandrate((uint)seed, (uint)max, stars);
-
-                        EncounterTera9 encounter = null;
-                        foreach (var theencounter in Tera)
-                        {
-                            var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
-                            if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
-                            {
-                                if ((Species)theencounter.Species == (Species)raid.pkm.Species)
-                                {
-                                    encounter = theencounter;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (encounter == null)
-                        {
-                            // seed = seed;
-                            continue;
-                        }
-
-
-                        var oid = getoid((uint)seed);
-                        var pid = getpid((uint)seed);
-                        uint num = pid ^ oid;
-                        var xor = (num ^ (num >> 16)) & 0xFFFFu;
-                        raid.pkm.SetIsShiny(xor < 16); break;
-
-                    case TeraRaidContentType.Black6:
-                        starxoro = getxoronextint((uint)seed, 100);
-                        stars =  6;
-                        
-
-
-                        max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
-
-                        rateRand = getxororandrate((uint)seed, (uint)max, stars);
-
-                        encounter = null;
-                        foreach (var theencounter in Tera)
-                        {
-                            var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
-                            if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
-                            {
-                                if ((Species)theencounter.Species == (Species)raid.pkm.Species)
-                                {
-                                    encounter = theencounter;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (encounter == null)
-                        {
-                            // seed = seed;
-                            continue;
-                        }
-
-
-                        oid = getoid((uint)seed);
-                        pid = getpid((uint)seed);
-                        num = pid ^ oid;
-                        xor = (num ^ (num >> 16)) & 0xFFFFu;
-                        raid.pkm.SetIsShiny(xor < 16); break;
-                    case TeraRaidContentType.Distribution:
-                        EncounterRaid9 dencounter = null;
-                        //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
-                        foreach (var theencounter in dist)
-                        {
-                            var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                            var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                            if (min >= 0 && maxd > 0)
-                            {
-
-                                var rateRandd = getxororandrate((uint)seed, maxd, theencounter.Stars);
-                                if ((uint)(rateRandd - min) < theencounter.RandRate)
-                                {
-                                    if ((Species)theencounter.Species == (Species)raid.pkm.Species)
-                                    {
-                                        dencounter = theencounter;
-                                        break;
-                                    }
-                                }
-
-                            }
-                        }
-                        if (dencounter == null)
-                            continue;
-                        oid = getoid((uint)seed);
-                        pid = getpid((uint)seed);
-                        num = pid ^ oid;
-                        xor = (num ^ (num >> 16)) & 0xFFFFu;
-                        raid.pkm.SetIsShiny(xor < 16); break;
-                    case TeraRaidContentType.Might7:
-                        EncounterRaid9 mencounter = null;
-                        //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
-                        foreach (var theencounter in might)
-                        {
-                            var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                            var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                            if (min >= 0 && maxd > 0)
-                            {
-
-                                var rateRandd = getxororandrate((uint)seed, maxd, 5);
-                                if ((uint)(rateRandd - min) < theencounter.RandRate)
-                                {
-                                    if ((Species)theencounter.Species == (Species)raid.pkm.Species)
-                                    {
-                                        mencounter = theencounter;
-                                        break;
-                                    }
-                                }
-
-                            }
-                        }
-                        if (mencounter == null)
-                            continue;
-                        oid = getoid((uint)seed);
-                        pid = getpid((uint)seed);
-                        num = pid ^ oid;
-                        xor = (num ^ (num >> 16)) & 0xFFFFu;
-                        raid.pkm.SetIsShiny(xor < 16); break;
-                }
-
+                raid.Raid.Seed = await findshinyseed(raid, seed);
+            }catch(Exception)
+            {
+                break;
             }
-            raid.Raid.Seed = (uint)seed;
             v++;
         }
             var raidspawn = tempsave.Raid;
@@ -256,7 +118,8 @@ public partial class teleporter : ContentPage
             int j = 0;
             foreach (var raidi in allraids)
             {
-             
+                allshinybutton.Text = $"loading {j}";
+                await Task.Delay(100);
                 raidi.Seed = raidlists[j].Raid.Seed;
                 j++;
                 if (j > 67)
@@ -283,8 +146,151 @@ public partial class teleporter : ContentPage
             var raidpointer = new List<long> { 0x4384B18, 0x180, 0x40 };
             var raidoff = await botBase.PointerRelative(raidpointer);
             await botBase.WriteBytesAsync(tempsave.Raid.Data, (uint)raidoff);
+            allshinybutton.Text = "Shinify all";
         }
-        allshinybutton.Text = "Shinify All";
+        allshinybutton.Text = "Shinify all";
+    }
+    public async Task<int> getxororandrateasync(uint seed, uint max, int stars) => getxororandrate(seed, max, stars);
+
+    public async Task<uint> getoidasync(uint seed) => getoid(seed);
+    public async Task<uint> getpidasync(uint seed) => getpid(seed);
+    public async Task<uint> findshinyseed(raidsprite raid,ulong seed)
+    {
+        
+        while (!raid.pkm.IsShiny)
+        {
+            seed++;
+            switch (raid.Raid.Content)
+            {
+                case TeraRaidContentType.Base05:
+                   
+                    var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(raid.Stars) : PKHeX.Core.EncounterTera9.GetRateTotalBaseVL(raid.Stars);
+
+                    var rateRand = await getxororandrateasync((uint)seed, (uint)max, raid.Stars);
+                   
+                    EncounterTera9 encounter = null;
+                    foreach (var theencounter in Tera)
+                    {
+                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        if (theencounter.Stars == raid.Stars && min >= 0 && (byte)(rateRand - min) < theencounter.RandRate)
+                        {
+                            if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                            {
+                                encounter = theencounter;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (encounter == null)
+                    {
+                        
+                        continue;
+                    }
+
+                    var oid = await getoidasync((uint)seed);
+                 
+                    var pid = await getpidasync((uint)seed);
+                   
+                    uint num = pid ^ oid;
+                    var xor = (num ^ (num >> 16)) & 0xFFFFu;
+                    raid.pkm.SetIsShiny(xor < 16);
+                    break;
+
+                case TeraRaidContentType.Black6:
+                    max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(raid.Stars) : EncounterTera9.GetRateTotalBaseVL(raid.Stars);
+
+                    rateRand = await getxororandrateasync((uint)seed, (uint)max, raid.Stars);
+
+                    encounter = null;
+                    foreach (var theencounter in Tera)
+                    {
+                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        if (theencounter.Stars == raid.Stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
+                        {
+                            if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                            {
+                                encounter = theencounter;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (encounter == null)
+                    {
+                        // seed = seed;
+                        continue;
+                    }
+
+
+                    oid = await getoidasync((uint)seed);
+                    pid = await getpidasync((uint)seed);
+                    num = pid ^ oid;
+                    xor = (num ^ (num >> 16)) & 0xFFFFu;
+                    raid.pkm.SetIsShiny(xor < 16); break;
+                case TeraRaidContentType.Distribution:
+                    EncounterRaid9 dencounter = null;
+                    //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
+                    foreach (var theencounter in dist)
+                    {
+                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        if (min >= 0 && maxd > 0)
+                        {
+
+                            var rateRandd = await getxororandrateasync((uint)seed, maxd, theencounter.Stars);
+                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+                            {
+                                if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                                {
+                                    dencounter = theencounter;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                    if (dencounter == null)
+                        continue;
+                    oid = await getoidasync((uint)seed);
+                    pid = await getpidasync((uint)seed);
+                    num = pid ^ oid;
+                    xor = (num ^ (num >> 16)) & 0xFFFFu;
+                    raid.pkm.SetIsShiny(xor < 16); break;
+                case TeraRaidContentType.Might7:
+                    EncounterRaid9 mencounter = null;
+                    //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
+                    foreach (var theencounter in might)
+                    {
+                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        if (min >= 0 && maxd > 0)
+                        {
+
+                            var rateRandd = await getxororandrateasync((uint)seed, maxd, 5);
+                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+                            {
+                                if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                                {
+                                    mencounter = theencounter;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                    if (mencounter == null)
+                        continue;
+                    oid = await getoidasync((uint)seed);
+                    pid = await getpidasync((uint)seed);
+                    num = pid ^ oid;
+                    xor = (num ^ (num >> 16)) & 0xFFFFu;
+                    raid.pkm.SetIsShiny(xor < 16); break;
+            }
+            
+
+        }
+        return (uint)seed;
     }
     public async Task<List<raidsprite>> raidlist()
     {
@@ -557,9 +563,5 @@ public partial class teleporter : ContentPage
 
         return (int)xoro.NextInt(rand);
     }
-    public ulong getxoronextseed(uint seed)
-    {
-        var xoro = new Xoroshiro128Plus(seed);
-        return xoro.Next();
-    }
+
 }

@@ -335,7 +335,10 @@ public partial class RaidViewer : ContentPage
         return returnlist;
 
     }
+    public async Task<int> getxororandrateasync(uint seed, uint max, int stars) => getxororandrate(seed, max, stars);
 
+    public async Task<uint> getoidasync(uint seed) => getoid(seed);
+    public async Task<uint> getpidasync(uint seed) => getpid(seed);
     private async void shinify(object sender, EventArgs e)
     {
         testlab.Text = "searching";
@@ -344,157 +347,136 @@ public partial class RaidViewer : ContentPage
         ulong seed = (ulong)mainpk.Raid.Seed;
         while (!mainpk.pkm.IsShiny)
         {
-
-            seed = getxoronextseed((uint)seed);
-            switch (mainpk.Raid.Content)
-            {
-                case TeraRaidContentType.Base05:
-                    int starxoro = getxoronextint((uint)seed, 100);
-                    var stars = CalcStars(starxoro, progress);
-                    if (mainpk.Raid.Content == TeraRaidContentType.Black6)
-                        stars = 6;
-                    
+                seed++;
+                switch (mainpk.Raid.Content)
+                {
+                    case TeraRaidContentType.Base05:
+                       
 
 
-                    var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
-                    var rateRand = getxororandrate((uint)seed, (uint)max, stars);
+                        var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(mainpk.Stars) : EncounterTera9.GetRateTotalBaseVL(mainpk.Stars);
 
-                    EncounterTera9 encounter = null;
-                    foreach (var theencounter in Tera)
-                    {
-                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
-                        if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
+                        var rateRand = await getxororandrateasync((uint)seed, (uint)max, mainpk.Stars);
+
+                        EncounterTera9 encounter = null;
+                        foreach (var theencounter in Tera)
                         {
-                            if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
-                            {
-                                encounter = theencounter;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (encounter == null)
-                    {
-                        // seed = seed;
-                        continue;
-                    }
-
-
-                    var oid = getoid((uint)seed);
-                    var pid = getpid((uint)seed);
-                    uint num = pid ^ oid;
-                    var xor = (num ^ (num >> 16)) & 0xFFFFu;
-                    mainpk.pkm.SetIsShiny(xor < 16); break;
-
-                case TeraRaidContentType.Black6:
-                    starxoro = getxoronextint((uint)seed, 100);
-                    stars = 6;
-                    
-
-
-                    max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
-
-                    rateRand = getxororandrate((uint)seed, (uint)max, stars);
-
-                    encounter = null;
-                    foreach (var theencounter in Tera)
-                    {
-                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
-                        if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
-                        {
-                            if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
-                            {
-                                encounter = theencounter;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (encounter == null)
-                    {
-                        // seed = seed;
-                        continue;
-                    }
-
-
-                    oid = getoid((uint)seed);
-                    pid = getpid((uint)seed);
-                    num = pid ^ oid;
-                    xor = (num ^ (num >> 16)) & 0xFFFFu;
-                    mainpk.pkm.SetIsShiny(xor < 16); break;
-                case TeraRaidContentType.Distribution:
-
-
-                    
-
-
-
-
-                    EncounterRaid9 dencounter = null;
-                    //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
-                    foreach (var theencounter in dist)
-                    {
-                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                        if (min >= 0 && maxd > 0)
-                        {
-
-                            var rateRandd = getxororandrate((uint)seed, maxd, theencounter.Stars);
-                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+                            var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                            if (theencounter.Stars == mainpk.Stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                             {
                                 if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
                                 {
-                                    dencounter = theencounter;
+                                    encounter = theencounter;
                                     break;
                                 }
                             }
-
                         }
-                    }
-                    if (dencounter == null)
-                        continue;
-                    oid = getoid((uint)seed);
-                    pid = getpid((uint)seed);
-                    num = pid ^ oid;
-                    xor = (num ^ (num >> 16)) & 0xFFFFu;
-                    mainpk.pkm.SetIsShiny(xor < 16); break;
-                case TeraRaidContentType.Might7:
 
-                   
-
-
-
-
-                    EncounterRaid9 mencounter = null;
-                    //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
-                    foreach (var theencounter in might)
-                    {
-                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                        if (min >= 0 && maxd > 0)
+                        if (encounter == null)
                         {
+                            // seed = seed;
+                            continue;
+                        }
 
-                            var rateRandd = getxororandrate((uint)seed, maxd, 5);
-                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+
+                        var oid = await getoidasync((uint)seed);
+                        var pid = await getpidasync((uint)seed);
+                        uint num = pid ^ oid;
+                        var xor = (num ^ (num >> 16)) & 0xFFFFu;
+                        mainpk.pkm.SetIsShiny(xor < 16); break;
+
+                    case TeraRaidContentType.Black6:
+            
+                        max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(mainpk.Stars) : EncounterTera9.GetRateTotalBaseVL(mainpk.Stars);
+
+                        rateRand = await getxororandrateasync((uint)seed, (uint)max, mainpk.Stars);
+
+                        encounter = null;
+                        foreach (var theencounter in Tera)
+                        {
+                            var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                            if (theencounter.Stars == mainpk.Stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                             {
                                 if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
                                 {
-                                    mencounter = theencounter;
+                                    encounter = theencounter;
                                     break;
                                 }
                             }
-
                         }
-                    }
-                    if (mencounter == null)
-                        continue;
-                    oid = getoid((uint)seed);
-                    pid = getpid((uint)seed);
-                    num = pid ^ oid;
-                    xor = (num ^ (num >> 16)) & 0xFFFFu;
-                    mainpk.pkm.SetIsShiny(xor < 16); break;
-            }
+
+                        if (encounter == null)
+                        {
+                            // seed = seed;
+                            continue;
+                        }
+
+
+                        oid = await getoidasync((uint)seed);
+                        pid = await getpidasync((uint)seed);
+                        num = pid ^ oid;
+                        xor = (num ^ (num >> 16)) & 0xFFFFu;
+                        mainpk.pkm.SetIsShiny(xor < 16); break;
+                    case TeraRaidContentType.Distribution:
+                        EncounterRaid9 dencounter = null;
+                        //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
+                        foreach (var theencounter in dist)
+                        {
+                            var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                            var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                            if (min >= 0 && maxd > 0)
+                            {
+
+                                var rateRandd = await getxororandrateasync((uint)seed, maxd, theencounter.Stars);
+                                if ((uint)(rateRandd - min) < theencounter.RandRate)
+                                {
+                                    if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
+                                    {
+                                        dencounter = theencounter;
+                                        break;
+                                    }
+                                }
+
+                            }
+                        }
+                        if (dencounter == null)
+                            continue;
+                        oid = await getoidasync((uint)seed);
+                        pid = await getpidasync((uint)seed);
+                        num = pid ^ oid;
+                        xor = (num ^ (num >> 16)) & 0xFFFFu;
+                        mainpk.pkm.SetIsShiny(xor < 16); break;
+                    case TeraRaidContentType.Might7:
+                        EncounterRaid9 mencounter = null;
+                        //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
+                        foreach (var theencounter in might)
+                        {
+                            var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                            var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                            if (min >= 0 && maxd > 0)
+                            {
+
+                                var rateRandd = await getxororandrateasync((uint)seed, maxd, 5);
+                                if ((uint)(rateRandd - min) < theencounter.RandRate)
+                                {
+                                    if ((Species)theencounter.Species == (Species)mainpk.pkm.Species)
+                                    {
+                                        mencounter = theencounter;
+                                        break;
+                                    }
+                                }
+
+                            }
+                        }
+                        if (mencounter == null)
+                            continue;
+                        oid = await getoidasync((uint)seed);
+                        pid = await getpidasync((uint)seed);
+                        num = pid ^ oid;
+                        xor = (num ^ (num >> 16)) & 0xFFFFu;
+                        mainpk.pkm.SetIsShiny(xor < 16); break;
+                }
         }
         SAV9SV tempsave = (SAV9SV)sav;
         var raidspawn = tempsave.Raid;
@@ -3147,21 +3129,16 @@ public partial class RaidViewer : ContentPage
                 url = $"https://www.serebii.net/scarletviolet/pokemon/new/{pk9.Species:000}.png";
 
             var starxoro = RaidViewer.getxoronextint(raid.Seed, 100);
-            var stars = starxoro switch
-            {
-                <= 30 => 3,
-                <= 70 => 4,
-                > 70 => 5,
-            };
+            var stars = RaidViewer.CalcStars(starxoro, progress);
             if (raid.Content == TeraRaidContentType.Black6)
                 stars = 6;
             if(raid.Content == TeraRaidContentType.Might7)
                 stars = 7;
-            Stars = stars.ToString();
+            Stars = stars;
             var noshinecolor = Application.Current.RequestedTheme == AppTheme.Light ? Colors.Black : Colors.White;
             shines = pk9.IsShiny ? Colors.Yellow : noshinecolor;
         }
-        public string Stars { get; set; }
+        public int Stars { get; set; }
         public string location { get; set; }
         public Color bgcolor { get; set; }
         public PKM pkm { get; set; }
