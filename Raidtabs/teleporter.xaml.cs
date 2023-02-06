@@ -164,14 +164,14 @@ public partial class teleporter : ContentPage
             {
                 case TeraRaidContentType.Base05:
                    
-                    var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(raid.Stars) : PKHeX.Core.EncounterTera9.GetRateTotalBaseVL(raid.Stars);
+                    var max = game == Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(raid.Stars) : PKHeX.Core.EncounterTera9.GetRateTotalBaseVL(raid.Stars);
 
                     var rateRand = await getxororandrateasync((uint)seed, (uint)max, raid.Stars);
                    
                     EncounterTera9 encounter = null;
                     foreach (var theencounter in Tera)
                     {
-                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == raid.Stars && min >= 0 && (byte)(rateRand - min) < theencounter.RandRate)
                         {
                             if ((Species)theencounter.Species == (Species)raid.pkm.Species)
@@ -198,14 +198,14 @@ public partial class teleporter : ContentPage
                     break;
 
                 case TeraRaidContentType.Black6:
-                    max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(raid.Stars) : EncounterTera9.GetRateTotalBaseVL(raid.Stars);
+                    max = game == Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(raid.Stars) : EncounterTera9.GetRateTotalBaseVL(raid.Stars);
 
                     rateRand = await getxororandrateasync((uint)seed, (uint)max, raid.Stars);
 
                     encounter = null;
                     foreach (var theencounter in Tera)
                     {
-                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == raid.Stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
                             if ((Species)theencounter.Species == (Species)raid.pkm.Species)
@@ -233,8 +233,8 @@ public partial class teleporter : ContentPage
                     //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxd > 0)
                         {
 
@@ -262,8 +262,8 @@ public partial class teleporter : ContentPage
                     //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in might)
                     {
-                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxd > 0)
                         {
 
@@ -345,8 +345,8 @@ public partial class teleporter : ContentPage
                     // var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxd > 0)
                         {
 
@@ -393,13 +393,13 @@ public partial class teleporter : ContentPage
                    
 
 
-                    var max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
+                    var max = game == Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
                     var rateRand = getxororandrate(raid.Seed, (uint)max, stars);
 
                     foreach (var theencounter in Tera)
                     {
-                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
 
@@ -440,13 +440,13 @@ public partial class teleporter : ContentPage
                    
 
 
-                    max = game is Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
+                    max = game == Offsets.ScarletID ? EncounterTera9.GetRateTotalBaseSL(stars) : EncounterTera9.GetRateTotalBaseVL(stars);
 
                     rateRand = getxororandrate(raid.Seed, (uint)max, stars);
 
                     foreach (var theencounter in Tera)
                     {
-                        var min = game is Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
+                        var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
 
@@ -486,8 +486,8 @@ public partial class teleporter : ContentPage
 
                     foreach (var theencounter in might)
                     {
-                        var maxm = game is Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game is Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                        var maxm = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
                         if (min >= 0 && maxm > 0)
                         {
 
