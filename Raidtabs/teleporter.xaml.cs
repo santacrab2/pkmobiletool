@@ -1,12 +1,14 @@
 
 using PKHeX.Core;
-
+using System.Text;
+using Newtonsoft.Json;
 using System.Windows.Input;
 using static PKHeX.Core.Encounters9;
 using static pk9reader.RaidViewer;
 
 
 using static pk9reader.MainPage;
+
 
 namespace pk9reader;
 
@@ -29,7 +31,9 @@ public partial class teleporter : ContentPage
         });
         teleportrefresh.Command = refreshCommand;
     }
+    public static HttpClient Client = new();
     public static byte[] recentcoords = Array.Empty<byte>();
+    public static string webhookurlstring = "";
     private async void readloc(object sender, EventArgs e)
     {
         try
@@ -168,7 +172,7 @@ public partial class teleporter : ContentPage
 
                     var rateRand = await getxororandrateasync((uint)seed, (uint)max, raid.Stars);
                    
-                    EncounterTera9 encounter = null;
+                    PKHeX.Core.EncounterTera9 encounter = null;
                     foreach (var theencounter in Tera)
                     {
                         var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
@@ -176,7 +180,7 @@ public partial class teleporter : ContentPage
                         {
                             if ((Species)theencounter.Species == (Species)raid.pkm.Species)
                             {
-                                encounter = theencounter;
+                                encounter = (PKHeX.Core.EncounterTera9)theencounter;
                                 break;
                             }
                         }
@@ -233,22 +237,26 @@ public partial class teleporter : ContentPage
                     //var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                        if (min >= 0 && maxd > 0)
+                        try
                         {
-
-                            var rateRandd = await getxororandrateasync((uint)seed, maxd, theencounter.Stars);
-                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+                            var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                            var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                            if (min >= 0 && maxd > 0)
                             {
-                                if ((Species)theencounter.Species == (Species)raid.pkm.Species)
-                                {
-                                    dencounter = theencounter;
-                                    break;
-                                }
-                            }
 
+                                var rateRandd = await getxororandrateasync((uint)seed, maxd, theencounter.Stars);
+                                if ((uint)(rateRandd - min) < theencounter.RandRate)
+                                {
+                                    if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                                    {
+                                        dencounter = theencounter;
+                                        break;
+                                    }
+                                }
+
+                            }
                         }
+                        catch{ dencounter = null; };
                     }
                     if (dencounter == null)
                         continue;
@@ -327,7 +335,7 @@ public partial class teleporter : ContentPage
         var allraids = raidspawn.GetAllRaids();
         EncounterRaid9 mencounter = null;
         EncounterRaid9 dencounter = null;
-        EncounterTera9 encounter = null;
+        PKHeX.Core.EncounterTera9 encounter = null;
         int i = 0;
         foreach (var raid in allraids)
         {
@@ -345,18 +353,22 @@ public partial class teleporter : ContentPage
                     // var dist = EncounterDist9.GetArray( tempsave.Blocks.GetBlock(0x520A1B0).Data);
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                        if (min >= 0 && maxd > 0)
+                        try
                         {
-
-                            var rateRandd = getxororandrate(raid.Seed, maxd, 5);
-                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+                            var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                            var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                            if (min >= 0 && maxd > 0)
                             {
-                                dencounter = theencounter; break;
-                            }
 
+                                var rateRandd = getxororandrate(raid.Seed, maxd, 5);
+                                if ((uint)(rateRandd - min) < theencounter.RandRate)
+                                {
+                                    dencounter = theencounter; break;
+                                }
+
+                            }
                         }
+                        catch { dencounter = null;  };
                     }
                     if (dencounter == null)
                         dencounter = dist[1];
@@ -564,4 +576,64 @@ public partial class teleporter : ContentPage
         return (int)xoro.NextInt(rand);
     }
 
+    private void setwebhookurl(object sender, TextChangedEventArgs e)
+    {
+        webhookurlstring = webhookurl.Text;
+    }
+
+    private async void sendhook(object sender, EventArgs e)
+    {
+        var pointerarr = "[[[[main+43A28F0]+10]+78]+10]+1A8";
+        var LinkCodePointer = await GetPointerAddress(pointerarr,CancellationToken.None);
+        var code = Encoding.Default.GetString(await botBase.ReadBytesAbsoluteAsync(LinkCodePointer, 8)).ToLower();
+
+
+        var screenshot = await botBase.Screengrab(CancellationToken.None);
+        var content = new MultipartFormDataContent();
+        var info = new
+        {
+            username = $"santacrab420",
+            avatar_url = "https://cdn.discordapp.com/attachments/872613946471899196/1073997897357594634/klawfpfp.png",
+            content = $"{code}",
+        };
+        var basic_info = new StringContent(JsonConvert.SerializeObject(info), Encoding.UTF8, "application/json");
+        content.Add(basic_info, "payload_json");
+        content.Add(new ByteArrayContent(screenshot), "screenshot.jpg", "screenshot.jpg");
+        var url = webhookurlstring;
+        Client.PostAsync(url, content).Wait();
+    }
+    public async Task<ulong> GetPointerAddress(string pointer, CancellationToken token, bool heaprealtive = false)
+    {
+        var ptr = pointer;
+        if (string.IsNullOrWhiteSpace(ptr) || ptr.IndexOfAny(new char[] { '-', '/', '*' }) != -1)
+            return 0;
+        while (ptr.Contains("]]"))
+            ptr = ptr.Replace("]]", "]+0]");
+        uint? finadd = null;
+        if (!ptr.EndsWith("]"))
+        {
+            finadd = Util.GetHexValue(ptr.Split('+').Last());
+            ptr = ptr[..ptr.LastIndexOf('+')];
+        }
+        var jumps = ptr.Replace("main", "").Replace("[", "").Replace("]", "").Split(new[] { "+" }, StringSplitOptions.RemoveEmptyEntries);
+        if (jumps.Length == 0)
+            return 0;
+
+        var initaddress = Util.GetHexValue(jumps[0].Trim());
+        ulong address = BitConverter.ToUInt64(await botBase.ReadBytesMainAsync(initaddress, 0x8).ConfigureAwait(false), 0);
+        foreach (var j in jumps)
+        {
+            var val = Util.GetHexValue(j.Trim());
+            if (val == initaddress)
+                continue;
+            address = BitConverter.ToUInt64(await botBase.ReadBytesAbsoluteAsync(address + val, 0x8).ConfigureAwait(false), 0);
+        }
+        if (finadd != null) address += (ulong)finadd;
+        if (heaprealtive)
+        {
+            ulong heap = await botBase.GetHeapBaseAsync();
+            address -= heap;
+        }
+        return address;
+    }
 }

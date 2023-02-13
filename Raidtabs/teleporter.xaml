@@ -12,6 +12,8 @@
             <Label x:Name="zlab" Text="0" FontSize="18"/>
             <Button Text="teleport to above" Clicked="teleloc" BackgroundColor="DeepSkyBlue"/>
             <Button x:Name="allshinybutton" Text="Shinify All" Clicked="Shinifyall" BackgroundColor="DeepSkyBlue" BorderColor="Black" BorderWidth="2"/>
+                <Editor x:Name="webhookurl" TextChanged="setwebhookurl" Text=""/>
+                <Button Text="Send Webhook" Clicked="sendhook" BackgroundColor="DeepSkyBlue"/>
             </VerticalStackLayout>
         </ScrollView>
     </RefreshView>

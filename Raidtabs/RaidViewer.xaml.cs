@@ -1,6 +1,6 @@
 
 using PKHeX.Core;
-
+using System.Text;
 using System.Windows.Input;
 using static PKHeX.Core.Encounters9;
 
@@ -54,6 +54,7 @@ public partial class RaidViewer : ContentPage
        
 
     }
+   
     public static Dictionary<string, double[]> denloc;
     public static EncounterRaid9[] dist;
     public static EncounterRaid9[] might;
@@ -126,7 +127,7 @@ public partial class RaidViewer : ContentPage
         var allraids = raidspawn.GetAllRaids();
         EncounterRaid9 mencounter = null;
         EncounterRaid9 dencounter = null;
-        EncounterTera9 encounter = null;
+        PKHeX.Core.EncounterTera9 encounter = null;
         int i = 0;
         foreach (var raid in allraids)
         {
@@ -137,18 +138,22 @@ public partial class RaidViewer : ContentPage
                 
                     foreach (var theencounter in dist)
                     {
-                        var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
-                        var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
-                        if (min >= 0 && maxd > 0)
+                        try
                         {
-
-                            var rateRandd = getxororandrate(raid.Seed, maxd, 5);
-                            if ((uint)(rateRandd - min) < theencounter.RandRate)
+                            var maxd = game == Offsets.ScarletID ? theencounter.GetRandRateTotalScarlet(3) : theencounter.GetRandRateTotalViolet(3);
+                            var min = game == Offsets.ScarletID ? theencounter.GetRandRateMinScarlet(3) : theencounter.GetRandRateMinViolet(3);
+                            if (min >= 0 && maxd > 0)
                             {
-                                dencounter = theencounter; break;
-                            }
 
+                                var rateRandd = getxororandrate(raid.Seed, maxd, 5);
+                                if ((uint)(rateRandd - min) < theencounter.RandRate)
+                                {
+                                    dencounter = theencounter; break;
+                                }
+
+                            }
                         }
+                        catch { dencounter = null; };
                     }
                     if (dencounter == null)
                         dencounter = dist[1];
@@ -195,7 +200,7 @@ public partial class RaidViewer : ContentPage
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
 
-                            encounter = theencounter;
+                            encounter = (PKHeX.Core.EncounterTera9)theencounter;
                             break;
                         }
                     }
@@ -242,7 +247,7 @@ public partial class RaidViewer : ContentPage
                         if (theencounter.Stars == stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
 
-                            encounter = theencounter;
+                            encounter = (PKHeX.Core.EncounterTera9)theencounter;
                             break;
                         }
                     }
@@ -352,7 +357,7 @@ public partial class RaidViewer : ContentPage
 
                         var rateRand = await getxororandrateasync((uint)seed, (uint)max, mainpk.Stars);
 
-                        EncounterTera9 encounter = null;
+                        PKHeX.Core.EncounterTera9 encounter = null;
                         foreach (var theencounter in Tera)
                         {
                             var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
@@ -656,6 +661,8 @@ public partial class RaidViewer : ContentPage
             }
             takeascreenshot(sender, e);
         }
+
+        
     }
     public async Task initializedicts()
     {
