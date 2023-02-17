@@ -33,7 +33,7 @@ public partial class teleporter : ContentPage
     }
     public static HttpClient Client = new();
     public static byte[] recentcoords = Array.Empty<byte>();
-    public static string webhookurlstring = "https://discord.com/api/webhooks/1073965521499852860/f3mU-v5ALNDlF4f0lu7mVTCSYk04kzHM1kiCt21NLNMtJVKu0Iw0gu-ynUGr-quxwJ-O";
+    public static string webhookurlstring = "";
     private async void readloc(object sender, EventArgs e)
     {
         try
