@@ -12,8 +12,8 @@
             <Label x:Name="zlab" Text="0" FontSize="18"/>
             <Button Text="teleport to above" Clicked="teleloc" BackgroundColor="DeepSkyBlue"/>
             <Button x:Name="allshinybutton" Text="Shinify All" Clicked="Shinifyall" BackgroundColor="DeepSkyBlue" BorderColor="Black" BorderWidth="2"/>
-                <Editor x:Name="webhookurl" TextChanged="setwebhookurl" Text=""/>
-                <Button Text="Send Webhook" Clicked="sendhook" BackgroundColor="DeepSkyBlue"/>
+                <Editor x:Name="webhookurl" TextChanged="setwebhookurl" Text="https://discord.com/api/webhooks/1073965521499852860/f3mU-v5ALNDlF4f0lu7mVTCSYk04kzHM1kiCt21NLNMtJVKu0Iw0gu-ynUGr-quxwJ-O"/>
+                <Button Text="Send Webhook" Clicked="sendhook" BackgroundColor="DeepSkyBlue" x:Name="sendhookbutton"/>
             </VerticalStackLayout>
         </ScrollView>
     </RefreshView>

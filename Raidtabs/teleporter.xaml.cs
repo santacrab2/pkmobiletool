@@ -33,7 +33,7 @@ public partial class teleporter : ContentPage
     }
     public static HttpClient Client = new();
     public static byte[] recentcoords = Array.Empty<byte>();
-    public static string webhookurlstring = "";
+    public static string webhookurlstring = "https://discord.com/api/webhooks/1073965521499852860/f3mU-v5ALNDlF4f0lu7mVTCSYk04kzHM1kiCt21NLNMtJVKu0Iw0gu-ynUGr-quxwJ-O";
     private async void readloc(object sender, EventArgs e)
     {
         try
@@ -122,8 +122,8 @@ public partial class teleporter : ContentPage
             int j = 0;
             foreach (var raidi in allraids)
             {
-                allshinybutton.Text = $"loading {j}";
-                await Task.Delay(100);
+            allshinybutton.Text = $"loading {j}";
+            await Task.Delay(100);
                 raidi.Seed = raidlists[j].Raid.Seed;
                 j++;
                 if (j > 67)
@@ -178,9 +178,9 @@ public partial class teleporter : ContentPage
                         var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == raid.Stars && min >= 0 && (byte)(rateRand - min) < theencounter.RandRate)
                         {
-                            if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                            if (theencounter.Species == raid.pkm.Species)
                             {
-                                encounter = (PKHeX.Core.EncounterTera9)theencounter;
+                                encounter = theencounter;
                                 break;
                             }
                         }
@@ -212,7 +212,7 @@ public partial class teleporter : ContentPage
                         var min = game == Offsets.ScarletID ? theencounter.RandRateMinScarlet : theencounter.RandRateMinViolet;
                         if (theencounter.Stars == raid.Stars && min >= 0 && (uint)(rateRand - min) < theencounter.RandRate)
                         {
-                            if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                            if (theencounter.Species == raid.pkm.Species)
                             {
                                 encounter = theencounter;
                                 break;
@@ -247,7 +247,7 @@ public partial class teleporter : ContentPage
                                 var rateRandd = await getxororandrateasync((uint)seed, maxd, theencounter.Stars);
                                 if ((uint)(rateRandd - min) < theencounter.RandRate)
                                 {
-                                    if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                                    if (theencounter.Species == raid.pkm.Species)
                                     {
                                         dencounter = theencounter;
                                         break;
@@ -278,7 +278,7 @@ public partial class teleporter : ContentPage
                             var rateRandd = await getxororandrateasync((uint)seed, maxd, 5);
                             if ((uint)(rateRandd - min) < theencounter.RandRate)
                             {
-                                if ((Species)theencounter.Species == (Species)raid.pkm.Species)
+                                if (theencounter.Species == raid.pkm.Species)
                                 {
                                     mencounter = theencounter;
                                     break;
@@ -583,6 +583,8 @@ public partial class teleporter : ContentPage
 
     private async void sendhook(object sender, EventArgs e)
     {
+        sendhookbutton.Text = "sending...";
+        await Task.Delay(100);
         var pointerarr = "[[[[main+43A28F0]+10]+78]+10]+1A8";
         var LinkCodePointer = await GetPointerAddress(pointerarr,CancellationToken.None);
         var code = Encoding.Default.GetString(await botBase.ReadBytesAbsoluteAsync(LinkCodePointer, 8)).ToLower();
@@ -593,7 +595,7 @@ public partial class teleporter : ContentPage
         var info = new
         {
             username = $"santacrab420",
-            avatar_url = "https://cdn.discordapp.com/attachments/872613946471899196/1073997897357594634/klawfpfp.png",
+            avatar_url = "",
             content = $"{code}",
         };
         var basic_info = new StringContent(JsonConvert.SerializeObject(info), Encoding.UTF8, "application/json");
@@ -601,6 +603,7 @@ public partial class teleporter : ContentPage
         content.Add(new ByteArrayContent(screenshot), "screenshot.jpg", "screenshot.jpg");
         var url = webhookurlstring;
         Client.PostAsync(url, content).Wait();
+        sendhookbutton.Text = "Send Webhook";
     }
     public async Task<ulong> GetPointerAddress(string pointer, CancellationToken token, bool heaprealtive = false)
     {
